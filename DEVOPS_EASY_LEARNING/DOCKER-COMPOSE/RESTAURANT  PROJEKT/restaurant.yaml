@@ -1,0 +1,145 @@
+version: '3.3'
+services:
+  yelb-ui:
+    image: mreferre/yelb-ui:0.7
+    ports:
+      - 1010:80
+    networks:
+      - sunshine
+    depends_on:
+      - yelb-appserver
+    container_name: yelb-ui
+
+  yelb-appserver:
+    image: mreferre/yelb-appserver:0.5
+    networks:
+      - sunshine
+    depends_on:
+      - redis-server
+      - yelb-db
+    container_name: yelb-appserver
+    
+  yelb-db:
+    image: mreferre/yelb-db:0.5
+    networks:
+      - sunshine
+    volumes:
+      - db:/var/lib/postgresql/data
+    container_name: yelb-db
+
+  odilia-db-replication01:
+    image: mreferre/yelb-db:0.5
+    networks:
+      - sunshine
+    volumes:
+      - db1:/var/lib/postgresql/data
+    container_name: odilia-db-replication01
+
+  odilia-db-replication02:
+    image: mreferre/yelb-db:0.5
+    networks:
+      - sunshine
+    volumes:
+      - db2:/var/lib/postgresql/data
+    container_name: odilia-db-replication02
+
+  odilia-db-replication03:
+    image: mreferre/yelb-db:0.5
+    networks:
+      - sunshine
+    volumes:
+      - db3:/var/lib/postgresql/data
+    container_name: odilia-db-replication03
+
+  
+  redis-server:
+    image: redis:4.0.2
+    networks:
+      - sunshine
+    volumes:
+    - redis:/etc/redis/redis.conf
+    command: redis-server /etc/redis/redis.conf
+    container_name: redis-server
+
+  odilia-redis01:
+    image: redis:4.0.2
+    networks:
+      - sunshine
+    volumes:
+      - redis1:/etc/redis/redis.conf
+    command: redis-server /etc/redis/redis.conf
+    container_name: odilia-redis01
+
+  odilia-redis02:
+    image: redis:4.0.2
+    networks:
+      - sunshine
+    volumes:
+      - redis2:/etc/redis/redis.conf
+    command: redis-server /etc/redis/redis.conf
+    container_name: odilia-redis02
+
+  odilia-redis-sentinel01:
+    image: redis:4.0.2
+    networks:
+      - sunshine
+    volumes:
+      - sentinel1:/etc/redis/sentinel.conf
+    command: redis-sentinel /etc/redis/sentinel.conf
+    depends_on:
+      - redis-server
+      - odilia-redis01
+      - odilia-redis02
+    container_name: odilia-redis-sentinel01
+
+  odilia-redis-sentinel02:
+    image: redis:4.0.2
+    volumes:
+      - sentinel2:/etc/redis/sentinel.conf
+    command: redis-sentinel /etc/redis/sentinel.conf
+    networks:
+      - sunshine
+    depends_on:
+      - redis-server
+      - odilia-redis01
+      - odilia-redis02
+    container_name: odilia-redis-sentinel02
+
+  odilia-redis-sentinel03:
+    image: redis:4.0.2
+    volumes:
+      - sentinel3:/etc/redis/sentinel.conf
+    command: redis-sentinel /etc/redis/sentinel.conf
+    networks:
+      - sunshine
+    depends_on:
+      - redis-server
+      - odilia-redis01
+      - odilia-redis02
+    container_name: odilia-redis-sentinel03
+
+networks:
+  sunshine:
+    driver: bridge
+
+volumes:
+  sentinel1:
+    driver: local
+  sentinel2:
+    driver: local
+  sentinel3:
+    driver: local
+  redis:
+    driver: local
+  redis1:
+    driver: local 
+  redis2:
+    driver: local
+  db:
+    driver: local
+  db1:
+    driver: local
+  db2:
+    driver: local
+  db3:
+    driver: local

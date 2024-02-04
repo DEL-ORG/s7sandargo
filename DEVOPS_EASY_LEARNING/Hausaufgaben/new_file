@@ -1,0 +1,12 @@
+version: '3.7'
+
+services:
+  portianer:
+    iamgae: redis
+
+  results: 
+    image: alpine
+
+  db:
+   image: postgresexit
+      

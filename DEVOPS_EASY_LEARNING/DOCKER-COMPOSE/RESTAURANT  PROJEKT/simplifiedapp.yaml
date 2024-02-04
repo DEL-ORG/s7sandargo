@@ -1,0 +1,50 @@
+version: "3.5"
+
+services:
+  yelb-ui: 
+    image: mreferre/yelb-ui:0.7
+    expose: 
+      - "80"
+    ports:
+      - "8157:80"
+    networks:
+      - netz
+    depends_on:
+      - yelb-appserver
+
+  yelb-appserver:
+    image: mreferre/yelb-appserver:0.5
+    networks:
+      - netz
+    depends_on: 
+      - redis-server
+      - yelb-db  
+    
+    
+  yelb-db:
+    image: mreferre/yelb-db:0.5
+    networks:
+      - netz
+    volumes:
+      - db-vol:/var/lib/postgresql/data
+
+
+  redis-server:
+    image: redis:4.0.2
+    networks:
+      - netz
+    volumes:
+      - redis-db:/etc/redis/redis.conf
+    command: redis-server /etc/redis/redis.conf
+
+
+networks:
+  netz:
+   driver: bridge
+
+volumes:
+  redis-db:
+    driver: local
+  db-vol:
+    driver: local
+  
