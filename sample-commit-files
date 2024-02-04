@@ -6,13 +6,7 @@ RUN npm ci
 COPY frontend .
 RUN npm run build
 
-# Stage 2: Build Backend
-FROM node:14 as backend-builder
-WORKDIR /app/backend
-COPY backend/package*.json ./
-RUN npm ci
-COPY backend .
-RUN npm run build
+
 
 # Stage 3: Final Image
 FROM node:14-alpine
@@ -36,6 +30,8 @@ COPY --chown=node:node docker-entrypoint.sh ./
 COPY .env ./
 
 # Set environment variables
+
+it is much fun
 ENV NODE_ENV=production
 
 # Expose ports
