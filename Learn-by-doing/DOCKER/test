@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  webapp:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    networks:
+      - frontend
+
+  database:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+    networks:
+      - backend
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+networks:
+  frontend:
+  backend:
+
+volumes:
+  db-data:
