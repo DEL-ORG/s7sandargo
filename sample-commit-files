@@ -21,4 +21,4 @@ EXPOSE 3000
 EXPOSE 3001
 
 # Start the application
-CMD ["./docker-entrypoint.sh"]
+CMD [ ....."./docker-entrypoint.sh"]
