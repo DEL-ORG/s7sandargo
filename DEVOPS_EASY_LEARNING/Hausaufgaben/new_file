@@ -1,12 +1,16 @@
-version: '3.7'
+VERSION: '3.8'
 
 services:
-  portianer:
+  port:
     iamgae: redis
 
-  results: 
-    image: alpine
+  
+    iMAge: alpine
 
   db:
    image: postgresexit
       
+    image: alpine
+
+  db:
+   image: postgresexit  
