@@ -1,0 +1,42 @@
+class Product:
+    def __init__(self, name, price, quantity):
+        self.name = name
+        self.price = price
+        self.quantity = quantity
+
+class Supermarket:
+    def __init__(self):
+        self.inventory = {}
+
+    def add_product(self, product):
+        if product.name in self.inventory:
+            self.inventory[product.name].quantity += product.quantity
+        else:
+            self.inventory[product.name] = product
+
+    def sell_product(self, name, quantity):
+        if name in self.inventory:
+            if self.inventory[name].quantity >= quantity:
+                self.inventory[name].quantity -= quantity
+                return self.inventory[name].price * quantity
+            else:
+                print("Insufficient quantity available")
+        else:
+            print("Product not found")
+
+    def display_inventory(self):
+        print("Inventory:")
+        for product in self.inventory.values():
+            print(f"{product.name}: ${product.price} - Quantity: {product.quantity}")
+
+supermarket = Supermarket()
+
+supermarket.add_product(Product("Apple", 1.50, 50))
+supermarket.add_product(Product("Banana", 0.75, 100))
+supermarket.add_product(Product("Orange", 1.25, 75))
+
+total_sales = supermarket.sell_product("Apple", 10)
+print(f"Sold 10 Apples for ${total_sales}")
+
+supermarket.display_inventory()
+
