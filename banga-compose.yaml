@@ -1,0 +1,92 @@
+version: '3.1'
+services:
+  db:
+    container_name: db
+    image: mysql:8.0.2
+    environment:
+      - MYSQL_ROOT_PASSWORD=my-secret-pw
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    expose:
+      - "3306"
+    networks:
+      - netz
+    restart: always
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    networks:
+      - netz
+    environment:
+      - REDIS_USER=redis
+      - REDIS_PASSWORD=redis
+    volumes:
+      - data_redis:/data
+    ports:
+      - "6379:6379"
+    expose:
+      - "6379"
+    restart: always
+
+  weather:
+    container_name: weather
+    image: devopseasylearning/banga-weather:v0.0.1
+    ports:
+      - "5000:5000"
+    expose:
+      - "5000"
+    environment:
+      - APIKEY=ecbc396f46mshb65cbb1f82cf334p1fcc87jsna5e962a3c542
+    restart: always
+    depends_on:
+      - db
+      - redis
+    networks:
+      - netz
+
+  auth:
+    container_name: auth
+    image: devopseasylearning/banga-auth:v0.0.1
+    ports:
+      - "8089:8080"
+    expose:
+      - "8080"
+    environment:
+      - DB_HOST=db
+      - DB_PASSWORD=my-secret-pw
+    networks:
+      - netz
+    restart: always
+    depends_on:
+      - db
+
+  ui:
+    container_name: ui
+    image: devopseasylearning/banga-ui:v0.0.1
+    ports:
+      - "3000:3000"
+    expose:
+      - "3000"
+    environment:
+      - AUTH_HOST=auth
+      - AUTH_PORT=8080
+      - WEATHER_HOST=weather
+      - WEATHER_PORT=5000
+      - REDIS_USER=redis
+      - REDIS_PASSWORD=redis
+    networks:
+      - netz
+    restart: always
+    depends_on:
+      - auth
+
+networks:
+  netz:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  data_redis:
