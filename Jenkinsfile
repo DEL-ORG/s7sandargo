@@ -7,6 +7,7 @@ pipeline {
             steps {
                 script {
                     sh '''
+                    ls
                     sleep 5
                     '''
                 }
@@ -17,6 +18,7 @@ pipeline {
             steps {
                 script {
                     sh '''
+                    pwd
                     sleep 5
                     '''
                 }
