@@ -22,7 +22,7 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId: 'sandargo-docker-hub-credential', variable: 'DOCKER_HUB_TOKEN')]) {
                     sh '''
-                    echo ${DOCKER_HUB_TOKEN} | docker login -u s5carles --password-stdin
+                    echo ${DOCKER_HUB_TOKEN} | docker login -u s7sandargo --password-stdin
                     '''
                 }
             }
