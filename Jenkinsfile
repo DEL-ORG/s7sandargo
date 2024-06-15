@@ -15,7 +15,7 @@ pipeline {
             steps {
                 sh '''
                 sleep 3
-                ls -l
+                ls 
                 pwd
                 '''
             }
