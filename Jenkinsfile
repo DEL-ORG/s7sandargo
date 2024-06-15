@@ -5,7 +5,7 @@ pipeline {
         stage('test') {
             steps {
                 sh '''
-                sleep 5
+                sleep 4
                 ls
                 pwd
                 '''
