@@ -2,11 +2,68 @@ pipeline {
     agent any
 
     stages {
-        stage('Hello') {
+        stage('test') {
             steps {
-                echo 'Hello World'
+                sh '''
+                sleep 5
+                ls
+                pwd
+                '''
+            }
+        }
+        stage('validate') {
+            steps {
+                sh '''
+                sleep 5
+                ls
+                pwd
+                '''
+            }
+        }
+        stage('scan') {
+            steps {
+                sh '''
+                sleep 5
+                ls
+                pwd
+                '''
+            }
+        }
+        stage('build') {
+            steps {
+                sh '''
+                sleep 5
+                ls
+                pwd
+                '''
+            }
+        }
+        stage('tag') {
+            steps {
+                sh '''
+                sleep 5
+                ls
+                pwd
+                '''
+            }
+        }
+        stage('push') {
+            steps {
+                sh '''
+                sleep 5
+                ls
+                pwd
+                '''
+            }
+        }
+        stage('deploy') {
+            steps {
+                sh '''
+                sleep 5
+                ls
+                pwd
+                '''
             }
         }
     }
 }
-
