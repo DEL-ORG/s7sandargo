@@ -5,7 +5,7 @@ pipeline {
         stage('test') {
             steps {
                 sh '''
-                sleep 4
+                sleep 3
                 ls
                 pwd
                 '''
@@ -14,8 +14,8 @@ pipeline {
         stage('validate') {
             steps {
                 sh '''
-                sleep 5
-                ls
+                sleep 3
+                ls -l
                 pwd
                 '''
             }
@@ -23,7 +23,7 @@ pipeline {
         stage('scan') {
             steps {
                 sh '''
-                sleep 5
+                sleep 3
                 ls
                 pwd
                 '''
@@ -32,7 +32,7 @@ pipeline {
         stage('build') {
             steps {
                 sh '''
-                sleep 5
+                sleep 3
                 ls
                 pwd
                 '''
@@ -41,7 +41,7 @@ pipeline {
         stage('tag') {
             steps {
                 sh '''
-                sleep 5
+                sleep 3
                 ls
                 pwd
                 '''
@@ -50,7 +50,7 @@ pipeline {
         stage('push') {
             steps {
                 sh '''
-                sleep 5
+                sleep 3
                 ls
                 pwd
                 '''
@@ -59,7 +59,7 @@ pipeline {
         stage('deploy') {
             steps {
                 sh '''
-                sleep 5
+                sleep 3
                 ls
                 pwd
                 '''
