@@ -1,0 +1,30 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = 'nginx:latest'
+        CONTAINER_NAME = 'nginx-container'
+    }
+
+    stages {
+        stage('Deploy NGINX') {
+            steps {
+                script {
+                    sh '''
+                    #!/bin/bash
+                    # Check if the Docker container is already running
+                    if [ "$(docker ps -q -f name=$CONTAINER_NAME)" ]; then
+                        echo "Stopping and removing existing container $CONTAINER_NAME"
+                        docker stop $CONTAINER_NAME
+                        docker rm $CONTAINER_NAME
+                    fi
+
+                    # Deploy NGINX container
+                    echo "Deploying NGINX container"
+                    docker run --name $CONTAINER_NAME -d -p 80:80 $DOCKER_IMAGE
+                    '''
+                }
+            }
+        }
+    }
+}
