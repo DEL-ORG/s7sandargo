@@ -1,16 +1,20 @@
-VERSION: '3.8'
-
-services:
-  port:
-    iamgae: redis
-
-  
-    iMAge: alpine
-
-  db:
-   image: postgresexit
-      
-    image: alpine
-
-  db:
-   image: postgresexit  
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: momentan-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: momentan
+  template:
+    metadata:
+      labels:
+        app: momentan
+    spec:
+      containers:
+      - name: momentan
+        image: your-dockerhub-username/momentan:latest
+        ports:
+        - containerPort: 8080 # Change to your application's port
+ 
