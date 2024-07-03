@@ -1,0 +1,53 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = "your-dockerhub-username/momentan:latest"
+        K8S_NAMESPACE = "s7sanadrgo" 
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build(DOCKER_IMAGE)
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials-id') {
+                        docker.image(DOCKER_IMAGE).push()
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    sh 'kubectl apply -f momentan-deployment.yaml --namespace=${K8S_NAMESPACE}'
+                    sh 'kubectl apply -f momentan-service.yaml --namespace=${K8S_NAMESPACE}'
+                    sh 'kubectl rollout status deployment/momentan-deployment --namespace=${K8S_NAMESPACE}'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Deployment succeeded!'
+        }
+        failure {
+            echo 'Deployment failed!'
+        }
+    }
+}
