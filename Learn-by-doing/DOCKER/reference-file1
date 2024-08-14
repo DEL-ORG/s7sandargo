@@ -1,0 +1,49 @@
+LINUS and ALL other important links for REFERENCE:
+
+https://www.linuxjournal.com/content/mastering-text-manipulation-sed-command ( SED COMMAND)
+
+https://www.linuxteck.com  ( the SED COMMAND and  12 important usages)
+
+https://www.youtube.com/watch?v=fmMg6cyww14/sed-commands-in-linux/ (SCP and file/directory copy among PCs and Servers)
+
+
+https://kube.academy/  (FREE KUBERNETES COURSE; MADE SIMPLE)
+ 
+https://m.youtube.com/watch?v=zJ6WbK9zFpI&feature=youtu.be (DOCKER TUTORIALS)
+
+https://www.geeksforgeeks.org/introduction-to-amazon-web-services/ (AWS MATERIAL)
+
+https://docker-curriculum.com/# (DOCKER FOR BEGINNERS)
+
+https://www.grymoire.com/Unix/Sed.html   (SED COMMAND)
+
+
+rm -rf  keys-access ~/.ssh  &&  git clone https://github.com/devopseasylearning/keys-access.git && cd keys-access && bash key.sh [ENTER YOUR PREFER NAME HERE]  && rm -rf  keys-access  (the entire command for activating servers 1,2 and 3)
+
+https://github.com/devopstia/s7     (DEVOPSEASYLEARNING MATERIAL)
+
+https://www.amazon.jobs/en/landing_pages/p-software-development-topics (AWS JOB SITE)
+
+https://www.forbes.com/sites/robinryan/2023/10/25/answers-to-7-hard-job-interview-questions/ (IMPORTANT INTERVIEW TIPS)
+
+https://www.forbes.com/sites/rachelwells/2023/10/22/how-many-jobs-should-you-apply-for-to-land-an-offer-in-2023/ (JOB INTERVIEW)
+
+
+https://www.vim.org/  (VIM for current Info)
+
+ssh-keygen -R server4.anomicatech.com ( USEFUL FOR REACTIVATING) A SERVER UP
+
+
+https://tldp.org/ ( The Linux Documentation Project)
+
+https://linuxsurvival.com/linux-tutorial-introduction/ (LINUX MATERIAL)
+https://linuxcommand.org/
+
+https://linuxjourney.com/change_locale/en
+
+https://www.pathname.com/fhs/pub/fhs-2.3.html
+https://thenewstack.io/10-kubernetes-best-practices-in-devops-without-chatgpt/
+
+
+
+
