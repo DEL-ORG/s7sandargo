@@ -1,3 +1,5 @@
+WHAT IS TLS?
+
 Transport Layer Security (TLS) is a cryptographic protocol used to secure communication over a network, typically between a client and a server. It ensures privacy, integrity, and authenticity of data transmitted over the network. Here's how TLS works:
 
 Handshake Protocol: The TLS handshake is the first step in establishing a secure connection. During the handshake, the client and server agree on encryption algorithms and exchange cryptographic keys.
