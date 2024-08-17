@@ -19,7 +19,7 @@ pipeline {
                 script {
                     sh '''
                     pwd
-                    sleep 5
+                    sleep 2
                     '''
                 }
             }
