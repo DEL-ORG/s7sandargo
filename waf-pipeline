@@ -1,0 +1,149 @@
+pipeline {
+    agent any
+
+    environment {
+        APP_NAME = "my-app"
+        IMAGE_NAME = "my-app-image"
+        K8S_NAMESPACE = "production"
+        WAF_URL = "https://waf.example.com/api/v1"
+        WAF_API_KEY = credentials('waf-api-key')
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout the code from the repository
+                git branch: 'main', url: 'https://github.com/my-org/my-app.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    // Build the Docker image
+                    docker.build("${IMAGE_NAME}:${env.BUILD_ID}")
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                // Run application tests
+                sh 'npm install'
+                sh 'npm test'
+            }
+        }
+
+        stage('WAF Pre-Deployment Check') {
+            steps {
+                script {
+                    // Send pre-deployment check to WAF
+                    def response = httpRequest (
+                        url: "${WAF_URL}/pre-deployment-check",
+                        customHeaders: [[name: 'Authorization', value: "Bearer ${WAF_API_KEY}"]],
+                        contentType: 'APPLICATION_JSON',
+                        httpMode: 'POST',
+                        requestBody: """
+                        {
+                            "appName": "${APP_NAME}",
+                            "imageTag": "${env.BUILD_ID}"
+                        }
+                        """
+                    )
+                    echo "WAF Pre-Deployment Check Response: ${response.content}"
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    // Deploy the application to Kubernetes
+                    sh """
+                        kubectl set image deployment/${APP_NAME} ${APP_NAME}=${IMAGE_NAME}:${env.BUILD_ID} -n ${K8S_NAMESPACE}
+                        kubectl rollout status deployment/${APP_NAME} -n ${K8S_NAMESPACE}
+                    """
+                }
+            }
+        }
+
+        stage('WAF Post-Deployment Configuration') {
+            steps {
+                script {
+                    // Notify WAF of new deployment
+                    def response = httpRequest (
+                        url: "${WAF_URL}/configure",
+                        customHeaders: [[name: 'Authorization', value: "Bearer ${WAF_API_KEY}"]],
+                        contentType: 'APPLICATION_JSON',
+                        httpMode: 'POST',
+                        requestBody: """
+                        {
+                            "appName": "${APP_NAME}",
+                            "environment": "${K8S_NAMESPACE}",
+                            "imageTag": "${env.BUILD_ID}"
+                        }
+                        """
+                    )
+                    echo "WAF Post-Deployment Configuration Response: ${response.content}"
+                }
+            }
+        }
+
+        stage('Post-Deployment Tests') {
+            steps {
+                script {
+                    // Run any post-deployment tests, such as health checks or integration tests
+                    sh 'curl --fail http://my-app.example.com/health || exit 1'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            script {
+                // Notify WAF about successful deployment
+                httpRequest (
+                    url: "${WAF_URL}/notify-success",
+                    customHeaders: [[name: 'Authorization', value: "Bearer ${WAF_API_KEY}"]],
+                    contentType: 'APPLICATION_JSON',
+                    httpMode: 'POST',
+                    requestBody: """
+                    {
+                        "appName": "${APP_NAME}",
+                        "environment": "${K8S_NAMESPACE}",
+                        "status": "success",
+                        "imageTag": "${env.BUILD_ID}"
+                    }
+                    """
+                )
+            }
+        }
+
+        failure {
+            script {
+                // Notify WAF about failed deployment
+                httpRequest (
+                    url: "${WAF_URL}/notify-failure",
+                    customHeaders: [[name: 'Authorization', value: "Bearer ${WAF_API_KEY}"]],
+                    contentType: 'APPLICATION_JSON',
+                    httpMode: 'POST',
+                    requestBody: """
+                    {
+                        "appName": "${APP_NAME}",
+                        "environment": "${K8S_NAMESPACE}",
+                        "status": "failure",
+                        "imageTag": "${env.BUILD_ID}"
+                    }
+                    """
+                )
+            }
+        }
+
+        always {
+            // Clean up
+            cleanWs()
+        }
+    }
+}
+
