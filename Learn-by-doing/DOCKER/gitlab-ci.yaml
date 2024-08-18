@@ -1,0 +1,163 @@
+stages:
+  - setup
+  - lint
+  - security
+  - build
+  - test
+  - staging
+  - production
+
+variables:
+  NODE_ENV: 'production'
+  APP_NAME: "my-app"
+  BUILD_DIR: "dist"
+  DEPLOY_ENV: "production"
+  K8S_NAMESPACE: "default"
+  KUBECONFIG: "/etc/deploy/.kube/config"
+
+before_script:
+  # Install dependencies common to all jobs
+  - apt-get update -y && apt-get install -y curl jq unzip
+  - npm install
+
+# 1. Setup Stage
+setup:
+  stage: setup
+  script:
+    - echo "Setting up environment..."
+    # Example: Setup Kubernetes credentials
+    - mkdir -p ~/.kube
+    - echo "$KUBECONFIG_CONTENT" | base64 -d > ~/.kube/config
+  only:
+    - main
+  tags:
+    - docker
+
+# 2. Lint Stage
+lint:
+  stage: lint
+  script:
+    - npm run lint
+  only:
+    - merge_requests
+    - main
+  tags:
+    - docker
+
+# 3. Security Stage
+security:
+  stage: security
+  script:
+    # Example: Run dependency checks
+    - npm audit
+    - npm audit --json > npm-audit-report.json
+    - if [ $(jq '.metadata.vulnerabilities.total' npm-audit-report.json) -gt 0 ]; then exit 1; fi
+  only:
+    - merge_requests
+    - main
+  tags:
+    - docker
+  artifacts:
+    paths:
+      - npm-audit-report.json
+    expire_in: 1 week
+
+# 4. Build Stage
+build:
+  stage: build
+  script:
+    - npm run build
+  artifacts:
+    paths:
+      - $BUILD_DIR
+    expire_in: 1 week
+  only:
+    - main
+  tags:
+    - docker
+
+# 5. Test Stage
+test:
+  stage: test
+  script:
+    - npm run test
+  only:
+    - merge_requests
+    - main
+  tags:
+    - docker
+  artifacts:
+    paths:
+      - coverage/
+    reports:
+      junit: junit.xml
+    expire_in: 1 week
+
+# 6. Staging Deployment
+staging_deploy:
+  stage: staging
+  script:
+    - echo "Deploying to Staging..."
+    - kubectl apply -f k8s/staging/deployment.yaml -n $K8S_NAMESPACE
+    - kubectl set image deployment/$APP_NAME $APP_NAME=$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA -n $K8S_NAMESPACE
+  environment:
+    name: staging
+    url: http://staging.my-app.example.com
+  only:
+    - main
+  tags:
+    - kubernetes
+
+# 7. Manual Staging Verification
+staging_verify:
+  stage: staging
+  script:
+    - echo "Verifying Staging Deployment..."
+    # Example: Test deployment health
+    - curl --fail http://staging.my-app.example.com/health || exit 1
+  environment:
+    name: staging
+  only:
+    - main
+  tags:
+    - docker
+  when: manual
+
+# 8. Production Deployment
+production_deploy:
+  stage: production
+  script:
+    - echo "Deploying to Production..."
+    - kubectl apply -f k8s/production/deployment.yaml -n $K8S_NAMESPACE
+    - kubectl set image deployment/$APP_NAME $APP_NAME=$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA -n $K8S_NAMESPACE
+  environment:
+    name: production
+    url: http://my-app.example.com
+  only:
+    - tags
+  tags:
+    - kubernetes
+
+# 9. Notify on Success
+notify_success:
+  stage: production
+  script:
+    - echo "Deployment successful!"
+    - curl -X POST -H 'Content-type: application/json' --data '{"text":"Production deployment successful"}' $SLACK_WEBHOOK_URL
+  only:
+    - tags
+  when: on_success
+  tags:
+    - docker
+
+# 10. Notify on Failure
+notify_failure:
+  stage: production
+  script:
+    - echo "Deployment failed."
+    - curl -X POST -H 'Content-type: application/json' --data '{"text":"Production deployment failed"}' $SLACK_WEBHOOK_URL
+  only:
+    - tags
+  when: on_failure
+  tags:
+    - docker
