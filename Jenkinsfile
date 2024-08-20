@@ -14,7 +14,7 @@ pipeline {
         stage('validate') {
             steps {
                 sh '''
-                sleep 3
+                sleep 2
                 ls 
                 pwd
                 '''
