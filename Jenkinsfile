@@ -16,7 +16,6 @@ pipeline {
                 sh '''
                 sleep 2
                 ls 
-                pwd
                 '''
             }
         }
