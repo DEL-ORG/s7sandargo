@@ -1,5 +1,5 @@
 def greet():
-    name = input("Enter your name: ")
+    name = input("Enter your name only: ")
     print(f"Hello, {name}! Welcome to Python programming.")
 
 if __name__ == "__main__":
